@@ -25,10 +25,24 @@ class FakeDB: DataStorage {
         CityInfo.mock(with: "Kazan", lat: 55.7879, lon: 49.1233),
     ]
     
+    func append(_ city: CityInfo) {
+        queue.async(flags: .barrier) {
+            self.listOfFavoritesCity.update(with: city)
+        }
+    }
+    
+    func remove(_ city: CityInfo) {
+        queue.async(flags: .barrier) {
+            self.listOfFavoritesCity.remove(city)
+        }
+    }
+    
     func getListOfFavoritesCity() -> [CityInfo] {
         var list = [CityInfo]()
         queue.sync {
-            list = Array(listOfFavoritesCity)
+            list = Array(listOfFavoritesCity).sorted {
+                $0.geoInfo.cityName < $1.geoInfo.cityName
+            }
         }
         return list
     }

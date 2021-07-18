@@ -1,16 +1,17 @@
 //
-//  DetailViewController.swift
+//  SearchResultsController.swift
 //  Weather
 //
-//  Created by Alexander Pelevinov on 14.07.2021.
+//  Created by Alexander Pelevinov on 18.07.2021.
 //
 
 import UIKit
 
-class DetailViewController: UIViewController {
+class SearchResultsController: UIViewController {
     
     var addCitydelegate: AddCityDelegate?
     private let tableView = UITableView()
+    private let buttonView = ButtonContainerView()
     var weatherData: CityInfo? {
         didSet {
             DispatchQueue.main.async {
@@ -23,13 +24,43 @@ class DetailViewController: UIViewController {
         title = "Detail"
         view.backgroundColor = .white
         configureTableView()
+        configureUI()
+        setupButtonAction()
     }
+    
+    private func setupButtonAction() {
+        buttonView.buttonAction = { [weak self] in
+                    guard let self = self,
+                          let weatherData = self.weatherData else { return }
+                    self.dismiss(animated: true) {
+                        self.addCitydelegate?.didAddCity(city: weatherData)
+                    }}
+    }
+    
+    private func configureUI() {
+        view.addSubview(tableView)
+        view.addSubview(buttonView)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        buttonView.translatesAutoresizingMaskIntoConstraints = false
+        [
+            buttonView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            buttonView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+            buttonView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
+            buttonView.heightAnchor.constraint(equalToConstant: 50),
+        ].forEach{ $0.isActive = true }
+        [
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: buttonView.topAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+        ].forEach{ $0.isActive = true }
+        
+    }
+    
 }
 
-extension DetailViewController: UITableViewDelegate, UITableViewDataSource {
+extension SearchResultsController: UITableViewDelegate, UITableViewDataSource {
     private func configureTableView() {
-        view.addSubview(tableView)
-        tableView.pin(to: view)
         tableView.delegate = self
         tableView.dataSource = self
         tableView.tableFooterView = UIView()

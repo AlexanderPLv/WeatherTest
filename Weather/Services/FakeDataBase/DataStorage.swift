@@ -10,4 +10,6 @@ import Foundation
 protocol DataStorage {
     func getListOfFavoritesCity() -> [CityInfo]
     func saveListOfFavoritesCity(_ data: [CityInfo])
+    func remove(_ city: CityInfo)
+    func append(_ city: CityInfo)
 }

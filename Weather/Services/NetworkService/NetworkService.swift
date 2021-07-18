@@ -20,7 +20,7 @@ class NetworkService: Networkable {
         return service
     }
     
-    func weatherRequest(for cities: [CityInfo],
+    func forecastRequest(for cities: [CityInfo],
                         completion: @escaping ([CityInfo]) -> Void) {
         var response = [CityInfo]()
         cities.forEach { [weak self] city in
@@ -39,6 +39,18 @@ class NetworkService: Networkable {
         }
         dispatchGroup.notify(queue: dispatchQueue) {
             completion(response)
+        }
+    }
+    
+    func forecastRequest(by coordinates: Coordinates,
+                         completion: @escaping (Result<CityInfo, Error>) -> Void) {
+        request(with: coordinates) { result in
+            switch result {
+            case .success(let result):
+                completion(.success(result))
+            case .failure(let error):
+                completion(.failure(error))
+            }
         }
     }
     

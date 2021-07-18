@@ -9,20 +9,15 @@ import UIKit
 
 class WeatherTableCell: UITableViewCell, ReusableView {
     
-    func set(_ weatherData: CityInfo) {
-        cityLabel.text = weatherData.geoInfo.cityName
-        setTempLabel(with: weatherData.weather.temp)
-        setImage(by: weatherData.weather.condition)
-    }
-    
     private let conditionImage = UIImageView()
        
     private let cityLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontSizeToFitWidth = true
         label.numberOfLines = 0
-        label.font = UIFont.systemFont(ofSize: 18)
+        label.font = UIFont.systemFont(ofSize: 20)
         label.contentMode = .left
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -30,7 +25,7 @@ class WeatherTableCell: UITableViewCell, ReusableView {
         let label = UILabel()
         label.adjustsFontSizeToFitWidth = true
         label.font = UIFont.systemFont(ofSize: 50)
-        label.contentMode = .left
+        label.contentMode = .center
         return label
     }()
     
@@ -41,6 +36,12 @@ class WeatherTableCell: UITableViewCell, ReusableView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func set(_ weatherData: CityInfo) {
+        cityLabel.text = weatherData.geoInfo.cityName
+        setTempLabel(with: weatherData.weather.temp)
+        setImage(by: weatherData.weather.condition)
     }
     
     private func setImage(by condition: Condition) {
@@ -64,24 +65,31 @@ class WeatherTableCell: UITableViewCell, ReusableView {
     
     private func setTempLabel(with temperature: Int) {
         if temperature < 100 {
-            tempLabel.text = String(temperature)
+            tempLabel.text = ("\(temperature)" + "°")
         } else {
             tempLabel.text = "--"
         }
     }
     
     private func configureCell() {
-        let stackView = UIStackView(arrangedSubviews: [cityLabel, tempLabel, conditionImage])
-        stackView.distribution = .equalSpacing
+        let stackView = UIStackView(arrangedSubviews: [tempLabel, conditionImage])
         stackView.axis = .horizontal
         stackView.spacing = 0
         stackView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(stackView)
+        addSubview(cityLabel)
+        let cityNameWidth: CGFloat = 120
+        [
+            cityLabel.topAnchor.constraint(equalTo: topAnchor),
+            cityLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 20) ,
+            cityLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
+            cityLabel.widthAnchor.constraint(equalToConstant: cityNameWidth)
+        ].forEach { $0.isActive = true }
         [
             stackView.topAnchor.constraint(equalTo: topAnchor),
-            stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            stackView.leadingAnchor.constraint(equalTo: cityLabel.trailingAnchor, constant: 8),
             stackView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
         ].forEach { $0.isActive = true }
     }
     
